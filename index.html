@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเปิดไพ่ออนไลน์เสี่ยงทาย ทีมงาน Horocenter </title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px; /* ขยายเพิ่มเล็กน้อยเพื่อให้รองรับ 3 ใบในแนวนอนได้ดีขึ้น */
+            margin: 0 auto;
+            background-color: #16161d;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border: 1px solid #d4af37;
+        }
+        h1 {
+            color: #d4af37;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap; /* รองรับหน้าจอมือถือ */
+            margin: 20px 0;
+        }
+        .card-display {
+            width: 280px; /* ปรับขนาดให้พอดีสำหรับแสดงผล 3 ใบ */
+            height: 500px; 
+            border: 2px dashed #d4af37;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0f0f1a;
+            overflow: hidden;
+        }
+        .card-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .result-text {
+            font-size: 16px;
+            margin-top: 20px;
+            min-height: 50px;
+            color: #e0e0e0;
+            line-height: 1.6;
+            padding: 0 10px;
+            text-align: left; /* เปลี่ยนเป็นชิดซ้ายเพื่อให้ดาวน์โหลดคำทำนาย 3 ใบอ่านง่าย */
+        }
+        .btn-random {
+            background: linear-gradient(45deg, #d4af37, #aa7c11);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
+            margin-top: 15px;
+        }
+        .btn-random:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(212,175,55,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔮 มหาตำนานแห่งจิตวิญญาน ไซอิ๋ว 🔮</h1>
+    
+    <!-- รวบการแสดงผลไพ่ให้อยู่ใน Container เดียวกัน -->
+    <div class="card-container">
+        <div class="card-display" id="cardDisplay1">
+            <img src="card-back.png" alt="หลังไพ่ใบที่ 1">
+        </div>
+        <div class="card-display" id="cardDisplay2">
+            <img src="card-back.png" alt="หลังไพ่ใบที่ 2">
+        </div>
+        <div class="card-display" id="cardDisplay3">
+            <img src="card-back.png" alt="หลังไพ่ใบที่ 3">
+        </div>
+    </div>
+    
+    <div class="result-text" id="resultText" style="text-align: center;">
+        ตั้งจิตอธิษฐานนึกถึงเรื่องที่ต้องการถาม แล้วกดปุ่มสุ่มไพ่
+    </div>
+    
+    <button class="btn-random" onclick="randomCard()">เปิดไพ่เสี่ยงทาย</button>
+</div>
+
+<script>
+    // แก้ไขข้อมูลที่ตกหล่น (ใบที่ 3 และ 5)
+    const cardData = [
+{ title: "ไพ่ใบที่ 1 พระถังซัมจั๋ง (Tripitaka)", meaning: "ผู้แสวงหาความจริง พันธกิจอันยิ่งใหญ่ และความศรัทธาที่ไม่สั่นคลอน" },
+{ title: "ไพ่ใบที่ 2 ซุนหงอคง (Sun Wukong)", meaning: "พลังอำนาจที่ไร้ขีดจำกัด ชัยชนะเหนืออุปสรรค และไหวพริบปฏิภาณ" },
+{ title: "ไพ่ใบที่ 3 ตือโป๊ยก่าย (Zhu Bajie)", meaning: "ความสุขทางโลก กิเลสและตัณหา โชคลาภและการเงิน" },
+{ title: "ไพ่ใบที่ 4 ซัวเจ๋ง (Sha Wujing)", meaning: "ความอดทนอดกลั้น ความมั่นคง และการเสียสละปิดทองหลังพระ" },
+{ title: "ไพ่ใบที่ 5 ม้ามังกรขาว (White Dragon Horse)", meaning: "พาหนะแห่งโชคชะตา การเดินทาง และการเปลี่ยนแปลงสถานะ" },
+{ title: "ไพ่ใบที่ 6 พระโพธิสัตว์กวนอิม (Guanyin)", meaning: "ความเมตตากรุณาอันไร้ขอบเขต และการปัดเป่าทุกข์ภัย" },
+{ title: "ไพ่ใบที่ 7 เง็กเซียนฮ่องเต้ (The Jade Emperor)", meaning: "อำนาจวาสนา การบริหารจัดการ และยศถาบรรดาศักดิ์" },
+{ title: "ไพ่ใบที่ 8 องค์หญิงพัดเหล็ก (Princess Iron Fan)", meaning: "อารมณ์รุนแรงที่ซ่อนอยู่ และความแค้นฝังลึก" },
+{ title: "ไพ่ใบที่ 9 เทพไท้เสียงเล่ากุง (Taishang Laojun)", meaning: "การขัดเกลาตนเอง การเปลี่ยนแปลงผ่านบททดสอบ และปัญญาชั้นสูง" },
+{ title: "ไพ่ใบที่ 10 นาจา (Nezha)", meaning: "พลังแห่งความขบถ การทลายกรอบเดิม และความกล้าหาญของวัยเยาว์" },
+{ title: "ไพ่ใบที่ 11 เทพสามตาเอ้อหลาง (Erlang Shen)", meaning: "ความซื่อตรง การตรวจสอบความถูกต้อง และผู้ออกกฎ" },
+{ title: "ไพ่ใบที่ 12 ท้าวจตุโลกบาล (The Four Heavenly Kings)", meaning: "การปกป้องคุ้มครอง ความปลอดภัยรอบทิศ และขอบเขตที่มั่นคง" },
+{ title: "ไพ่ใบที่ 13 พระแม่ตี้หมู่ (Earth Mother)", meaning: "ความเกื้อกูลจากมาตุภูมิ รากฐานชีวิตที่มั่นคง และการก่อกำเนิด" },
+{ title: "ไพ่ใบที่ 14 พญามังกรแห่งทะเลตะวันออก (Dragon King of East Sea)", meaning: "ผู้กุมทรัพย์สมบัติลับ อารมณ์ที่แปรปรวน และความมั่งคั่งใต้บาดาล" },
+{ title: "ไพ่ใบที่ 15 มหาเทพตงหัว (Donghua Dijun)", meaning: "ความสงบแห่งจิต ผู้นำทางจิตวิญญาณ และบารมีเก่าส่งผล" },
+{ title: "ไพ่ใบที่ 16 เทพเจ้าสระอโนดาต (Anavatapta Dragon King)", meaning: "การชำระล้างจิตใจ ความบริสุทธิ์ และการเริ่มต้นสิ่งใหม่ด้วยใจสะอาด" },
+{ title: "ไพ่ใบที่ 17 ราชาสวรรค์หลี่จิ้ง (Pagoda Heavenly King)", meaning: "ความเด็ดขาดในการปกครอง ความรับผิดชอบ และวินัยเหล็ก" },
+{ title: "ไพ่ใบที่ 18 เทพธิดาฉางเอ๋อ (Chang'e)", meaning: "เสน่ห์แห่งดวงจันทร์ ความโดดเดี่ยวที่งดงาม ความฝันและจินตนาการ" },
+{ title: "ไพ่ใบที่ 19 กระบองทองคำ (Ruyi Jingu Bang)", meaning: "พลังอำนาจเด็ดขาด การลงมือทำจริงจัง และการปกป้องคุ้มครอง" },
+{ title: "ไพ่ใบที่ 20 รัดเกล้ากิมกัว (The Golden Ring)", meaning: "สติรู้ตัว วินัยและการควบคุมตนเอง และขอบเขตที่ต้องปฏิบัติตาม" },
+{ title: "ไพ่ใบที่ 21 เมฆวิเศษ (Somersault Cloud)", meaning: "โอกาสใหม่ที่รวดเร็ว การเดินทางโยกย้าย และความก้าวหน้าก้าวกระโดด" },
+{ title: "ไพ่ใบที่ 22 พัดกล้วยวิเศษ (Banana Leaf Fan)", meaning: "การคลี่คลายปัญหา การดับความขัดแย้ง และการเยียวยาจิตใจ" },
+{ title: "ไพ่ใบที่ 23 บาตรทองคำ (The Golden Alms Bowl)", meaning: "ศรัทธาและความบริสุทธิ์ รวมถึงการเกื้อหนุนจากบุญกุศล" },
+{ title: "ไพ่ใบที่ 24 คัมภีร์พระไตรปิฎก (The Sacred Scriptures)", meaning: "ปัญญาความรู้ ทฤษฎีและระบบความคิด และการสอบสำเร็จ" },
+{ title: "ไพ่ใบที่ 25 ยาชุบชีวิต (The Resurrection Pill)", meaning: "โอกาสครั้งที่สอง การฟื้นตัวจากวิกฤต และการเริ่มต้นใหม่" },
+{ title: "ไพ่ใบที่ 26 ตะกร้ากวนอิม (Guanyin's Basket)", meaning: "การช่วยเหลือทันท่วงที เมตตาค้ำจุน และปาฏิหาริย์เคลียร์ปัญหา" },
+{ title: "ไพ่ใบที่ 27 ขวดกักฟ้าดิน (The Universe Bottle)", meaning: "ข้อจำกัดและขอบเขต การหยุดความวุ่นวาย และการเก็บตัวทบทวน" },
+{ title: "ไพ่ใบที่ 28 ถุงวิเศษ (The Magic Pouch)", meaning: "การดูดกลืนจัดเก็บ การรักษาความลับ และการสะสมทรัพย์สิน" },
+{ title: "ไพ่ใบที่ 29 เข็มศักดิ์สิทธิ์ (The Piercing Needle)", meaning: "การมองเห็นความจริงทะลุ การแก้ปัญหาตรงจุด และการเปิดโปงความฉ้อฉล" },
+{ title: "ไพ่ใบที่ 30 เรือไร้ก้น (The Bottomless Boat)", meaning: "การปล่อยวางขั้นสูงสุด การเปลี่ยนผ่านสู่อีกมิติ และการสละสิ่งเก่า" },
+{ title: "ไพ่ใบที่ 31 กระจกส่องมาร (The Demon-Revealing Mirror)", meaning: "การสะท้อนความจริง การรู้เท่าทันเล่ห์เหลี่ยม และการระวังภัย" },
+{ title: "ไพ่ใบที่ 32 น้ำเต้าอัญมณี (The Jade Gourd)", meaning: "การหลอมรวมและแปรเปลี่ยนธาตุ รวมถึงการเก็บกักพลังงานบวก" },
+{ title: "ไพ่ใบที่ 33 ไม้เท้าขักขระศักดิ์สิทธิ์ (The Khakkhara Staff)", meaning: "เสียงแห่งสติเตือนใจ พลังแห่งการนำทาง และความเป็นผู้นำคุณธรรม" },
+{ title: "ไพ่ใบที่ 34 เสื้อคลุมจีวรทองคำ (The Kasaya garment)", meaning: "เกราะป้องกันภัยฝ่ายวิญญาณ บารมีคุ้มตัว และเกียรทิยศที่งดงาม" },
+{ title: "ไพ่ใบที่ 35 เชือกมัดมังกร (The Dragon-Binding Rope)", meaning: "การผูกมัดสถานการณ์ การควบคุมสิ่งเหนือการควบคุม และพันธสัญญา" },
+{ title: "ไพ่ใบที่ 36 พลอยนพเก้าสวรรค์ (The Celestial Nine Jewels)", meaning: "สิริมงคลสูงสุด โชคลาภรอบด้าน และความอุดมสมบูรณ์พูนสุข" },
+{ title: "ไพ่ใบที่ 37 ปีศาจกระดูกขาว (White Bone Demon)", meaning: "ภาพลวงตาที่หลอกลวง อคติบังตาทำลายมิตรภาพ และความเข้าใจผิด" },
+{ title: "ไพ่ใบที่ 38 ปีศาจปลาทอง (Golden Fish Demon)", meaning: "กับดักที่ดูง่ายแต่แฝงอันตราย ความประมาทเลินเล่อ และสิ่งล่อใจไร้พิษ" },
+{ title: "ไพ่ใบที่ 39 ปีศาจแมงมุม (Spider Demons)", meaning: "ความลุ่มหลงมัวเมา เสน่ห์ยั่วยวน และความสัมพันธ์ที่เป็นพิษ (Toxic)" },
+{ title: "ไพ่ใบที่ 40 ปีศาจตะขาบ (Centipede Demon)", meaning: "พิษร้ายจากคำพูด การนินทาใส่ร้าย และศัตรูลอบกัดลับหลัง" },
+{ title: "ไพ่ใบที่ 41 ปีศาจแมงป่อง (Scorpion Demon)", meaning: "ความรักที่อันตรายและหึงหวง การครอบงำจิตใจ และอารมณ์รุนแรง" },
+{ title: "ไพ่ใบที่ 42 กระต่ายหยก (Jade Rabbit Demon)", meaning: "ภาพลักษณ์ที่ดูปลอม การแอบอ้างความดี และสิ่งลวง in คราบความบริสุทธิ์" },
+{ title: "ไพ่ใบที่ 43 ปีศาจงู (Snake Demon)", meaning: "เล่ห์เหลี่ยมเพทุบาย การล่อลวงอย่างเป็นระบบ และการปรับตัวไร้วิธีการ" },
+{ title: "ไพ่ใบที่ 44 ปีศาจกวางขาว (White Deer Demon)", meaning: "อำนาจและอิทธิพลที่ผิดศีลธรรม รวมถึงการใช้อำนาจหน้าที่ทุจริต" },
+{ title: "ไพ่ใบที่ 45 ปีศาจเสือดาว (Leopard Demon)", meaning: "การโจมตีที่เข้ามาไม่ทันตั้งตัว ความรวดเร็วรุนแรง และศัตรูซุ่มซ่อน" },
+{ title: "ไพ่ใบที่ 46 ปีศาจแรด (Rhinoceros Demons)", meaning: "ความโลภยึดติดผลประโยชน์ส่วนตน ดันทุรังหัวชนฝา และไม่แบ่งปัน" },
+{ title: "ไพ่ใบที่ 47 ปีศาจต้นไม้ (Tree Spirits)", meaning: "การติดในพื้นที่สบาย (Comfort Zone) หยุดพัฒนา และการผัดวันประกันพรุ่ง" },
+{ title: "ไพ่ใบที่ 48 ปีศาจคิ้วเหลือง (Yellow Eyebrow Demon)", meaning: "คนดีจอมปลอม การสร้างสถานการณ์ลวงตา และศรัทธาบิดเบือน" },
+{ title: "ไพ่ใบที่ 49 พญาหงส์ทอง (Great Peng)", meaning: "อุปสรรคขนาดมหึมายากจะข้าม แรงกดดันสูง และความหมดหวัง" },
+{ title: "ไพ่ใบที่ 50 ราชาปีศาจวัว (Bull Demon King)", meaning: "อัตตาตัวตนขัดขวางความก้าวหน้า และทิฐิมานะดื้อดึงไม่ยอมก้มหัว" },
+{ title: "ไพ่ใบที่ 51 นักพรตปีศาจ (Evil Taoist Priest)", meaning: "ศรัทธาและแนวคิดที่ผิดทาง หลงผิดตามคำชักจูง และใช้ความรู้ทางเสื่อม" },
+{ title: "ไพ่ใบที่ 52 ปีศาจหนูขาว (White Rat Demon)", meaning: "ภัยเงียบขโมยผลงาน ความริษยาแฝงเร้น และการยักยอกทรัพย์" },
+{ title: "ไพ่ใบที่ 53 ปีศาจสิงโตเก้าเศียร (Nine-Headed Lion Demon)", meaning: "ปัญหาเรื้อรังแตกหน่อ ความสับสนซับซ้อน และอุปสรรคหลายทิศทาง" },
+{ title: "ไพ่ใบที่ 54 ปีศาจลมดำ (Black Wind Demon)", meaning: "ความโกรธหลงผิดชั่ววูบ อารมณ์มืดบดบังจิตปัญญา และพายุอารมณ์" },
+{ title: "ไพ่ใบที่ 55 ปีศาจค้างคาว (Bat Demon)", meaning: "ข่าวลือแฝงร้าย การใส่ร้ายในที่มืด และความกลัวสิ่งมองไม่เห็น" },
+{ title: "ไพ่ใบที่ 56 ปีศาจหมีดำ (Black Bear Demon)", meaning: "ความหลงใหลในความงามจนเกิดตัณหายึดครอง และการขโมยเกียรติ" },
+{ title: "ไพ่ใบที่ 57 ปีศาจพุดทรา (Jujube Demon)", meaning: "ความหอมหวานแฝงพิษร้าย คำลวงหวานหู และผลประโยชน์ระยะสั้นฉาบฉวย" },
+{ title: "ไพ่ใบที่ 58 ปีศาจควันพิษ (Toxic Smoke Demon)", meaning: "สภาพแวดล้อมเป็นพิษ (Toxic Environment) และความอึดอัดขัดแย้งในงาน" },
+{ title: "ไพ่ใบที่ 59 ปีศาจกระจกเงา (Mirror Imp)", meaning: "การหลอกตัวเอง การปฏิเสธความจริง และการสร้างภาพลวงตาให้ตนเองสุข" },
+{ title: "ไพ่ใบที่ 60 พญามารสวรรค์ (Mara)", meaning: "บททดสอบจิตขั้นสุดท้าย กิเลสระดับละเอียด และความลังเลสงสัยในความดี" },
+{ title: "ไพ่ใบที่ 61 กฎแห่งกรรม (Karma)", meaning: "เหตุและผลของการกระทำ ความยุติธรรมสากล และการเก็บเกี่ยวผล" },
+{ title: "ไพ่ใบที่ 62 สมดุลแห่งฟ้าและดิน (The Harmony of Yin and Yang)", meaning: "ความลงตัวของชีวิตทุกมิติ การผสานกายใจ และทางสายกลาง" },
+{ title: "ไพ่ใบที่ 63 จุดหมายแห่งมหาปัญญา (The Ultimate Wisdom Destination)", meaning: "การบรรลุเป้าหมายสูงสุด และความสมบูรณ์ของการเดินทางยาวนาน" },
+{ title: "ไพ่ใบที่ 64 การปล่อยวางความยึดมั่น (Detachment)", meaning: "การสลัดตัวตนเปลือกนอก ความอิสระทางจิตวิญญาณ และความว่าง" },
+{ title: "ไพ่ใบที่ 65 พระธรรมจักรหมุนเวียน (The Turning Wheel of Dhamma)", meaning: "การเปลี่ยนแปลงที่เป็นนิรันดร์ วัฏจักรชีวิต และการยอมรับความจริง" },
+{ title: "ไพ่ใบที่ 66 ประทีปส่องธรรม (The Lamp of Truth)", meaning: "ปัญญาญาณนำทางในความมืด ความชัดเจนหลังความสับสน และแสงสว่างนำทาง" },
+{ title: "ไพ่ใบที่ 67 น้ำทิพย์เยียวยา (The Elixir of Compassion)", meaning: "การให้อภัยอโหสิกรรม การสมานแผลใจ และความเมตตาจิต" },
+{ title: "ไพ่ใบที่ 68 อารามสวรรค์หนานซาน (The Southern Mountain Monastery)", meaning: "ความสันโดษที่เกื้อกูล การพักผ่อนชาร์จพลังจิต และความสงบเงียบ" },
+{ title: "ไพ่ใบที่ 69 พันธสัญญาศักดิ์สิทธิ์ (The Sacred Covenant)", meaning: "ความสัจจะวาจา ความซื่อสัตย์ต่อปณิธานชีวิต และหุ้นส่วนระยะยาว" },
+{ title: "ไพ่ใบที่ 70 สู่ความเป็นหนึ่งเดียวกับจักรวาล (Oneness with the Universe)", meaning: "มหาบทสรุปการเดินทาง ความว่างที่สมบูรณ์ และการหลอมรวมสิ้นเชิง" },
+    ];
+
+    function randomCard() {
+        const textDiv = document.getElementById('resultText');
+        textDiv.style.textAlign = "center";
+        textDiv.innerHTML = "กำลังเปิดไพ่...";
+
+        // ใส่เอฟเฟกต์รูป🔮 ระหว่างสุ่มให้ทั้ง 3 ช่อง
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`cardDisplay${i}`).innerHTML = "<span style='font-size: 40px;'>🔮</span>";
+        }
+
+        setTimeout(() => {
+            let resultHTML = "";
+            
+            // ลูปทำงาน 3 ครั้งเพื่อสุ่มไพ่ 3 ใบ
+            for (let i = 1; i <= 3; i++) {
+                const randomIndex = Math.floor(Math.random() * cardData.length);
+                const selectedCard = cardData[randomIndex];
+                const cardNumber = randomIndex + 1;
+
+                // อัปเดตรูปภาพของไพ่แต่ละใบตาม ID (cardDisplay1, cardDisplay2, cardDisplay3)
+                document.getElementById(`` + `cardDisplay${i}`).innerHTML = `<img src="card${cardNumber}.png" alt="${selectedCard.title}">`;
+                
+                // รวมข้อความคำทำนาย
+                resultHTML += `<strong>ใบที่ ${i} - ${selectedCard.title}:</strong> ${selectedCard.meaning}<br><br>`;
+            }
+
+            // แสดงคำทำนายรวมของทั้ง 3 ใบ
+            textDiv.style.textIndent = "0";
+            textDiv.style.textAlign = "left";
+            textDiv.innerHTML = resultHTML;
+        }, 500);
+    }
+</script>
+
+</body>
+</html>
